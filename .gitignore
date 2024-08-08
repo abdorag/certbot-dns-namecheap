@@ -33,3 +33,8 @@ tags
 
 # docker files
 .docker
+
+# config files
+namecheap.ini
+certs
+logs
