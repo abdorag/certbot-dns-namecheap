@@ -1,5 +1,5 @@
 """
-The `~certbot_dns_namechap.dns_namechap` plugin automates the process of
+The `~certbot_dns_namechep.dns_namechep` plugin automates the process of
 completing a ``dns-01`` challenge (`~acme.challenges.DNS01`) by creating, and
 subsequently removing, TXT records using the Namecheap API.
 
