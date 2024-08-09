@@ -1,6 +1,7 @@
 # General
 
 This plugin automates the process of completing a ``dns-01`` challenge by creating, and subsequently removing, TXT records using the (XML-RPC-based) namecheap.com API.
+updated to work in python3.x
 
 ------------------
 
@@ -20,41 +21,54 @@ Use of this plugin requires a configuration file containing Namecheap API creden
 
 ```ini
 # Namecheap API credentials used by Certbot
-certbot_dns_namecheap:dns_namecheap_username=my-username
-certbot_dns_namecheap:dns_namecheap_api_key=my-api-key
+dns_namecheap_username=my-username
+dns_namecheap_api_key=my-api-key
 ```
 
-The path to this file can be provided by using the `--certbot_dns_namecheap:dns-namecheap-credentials` command-line argument.
+The path to this file can be provided by using the `--dns-namecheap-credentials` command-line argument.
 
-## Usage
+### Usage
 
-### Docker
-
-- **Recommended usage**. Create the credentials file and 2 folders for the certificates and logs and run:
+- Make sure that you have python3-full installed.
 
 ```sh
-docker run -it --rm \
-  -v $(pwd)/certs:/etc/letsencrypt \
-  -v $(pwd)/logs:/var/log/letsencrypt \
-  -v $(pwd)/namecheap.ini:/namecheap.ini \
-  schubc/certbot-dns-namecheap certonly \
-  -a certbot-dns-namecheap:dns-namecheap \
-  --certbot-dns-namecheap:dns-namecheap-credentials=/namecheap.ini \
-  --agree-tos \
-  -email "your@mail.com" \
-  -d example.com \
-  --test-cert
+python --version
 ```
 
-- After a successful run, remove the last parameter `--test-cert` which enabled [staging server](https://letsencrypt.org/docs/staging-environment/) and run again.
-
-## Python
-
-- If you know what you're doing install the plugin into the same python environment like `certbot`. In any other case follow the `Docker` approach above:
+- clone the repo anyware you want to store it
 
 ```sh
-git clone https://github.com/iHamsterball/certbot-dns-namecheap.git
-pip install certbot-dns-namecheap/
+git clone  https://github.com/abdorag/certbot-dns-namecheap.git
+```
+
+- go the repo dir
+
+```sh
+cd repo-dir-certbot-dns-namecheap
+```
+
+- create the ini file
+
+```sh
+nano namecheap.ini
+```
+
+## Important
+- **Not recommended usage** If you know what you're doing install the plugin into the same python environment like `certbot`.
+- **Recommended usage** work in isolated enviroment use this routine by creating speacial command as I will show in steps:
+
+- install virtual modules
+
+```sh
+sudo apt install python3-venv python3-pip
+```
+
+- start virtual env and install the package
+
+```sh
+python3 -m venv ~/certbot-venv
+source ~/certbot-venv/bin/activate
+pip install .
 ```
 
 - Check that `certbot` discovers the plugin:
@@ -62,15 +76,60 @@ pip install certbot-dns-namecheap/
 ```sh
 certbot plugins
 ```
+you must see the package name certbot-dns-namecheap in the list
 
 - Now run the command:
 
 ```sh
 certbot certonly \
-  -a certbot-dns-namecheap:dns-namecheap \
-  --certbot-dns-namecheap:dns-namecheap-credentials=/namecheap.ini \
+  -a dns-namecheap \
+  --dns-namecheap-credentials=/namecheap.ini \
   --agree-tos \
   -email "your@mail.com" \
   -d example.com \
   --test-cert
-  ```
+```
+if it works that mean you had success installing and use
+
+- Deactivate the virtual environment
+
+```sh
+deactivate
+```
+
+- creat auto use for the virtual enviroment
+
+```sh
+nano /usr/local/bin/certbot-namecheap
+```
+
+```bash
+#bash
+#!/bin/bash
+# Activate the virtual environment
+source /path/to/certbot-venv/bin/activate
+
+# Run Certbot with all arguments passed to the script
+certbot "$@"
+
+# Deactivate the virtual environment
+deactivate
+```
+
+- give the script excut ablity
+
+```sh
+chmod +x /usr/local/bin/certbot-namecheap
+```
+
+#command for tested example 
+certbot-namecheap [certbot commands]
+```sh
+certbot-namecheap certonly \
+  -a dns-namecheap \
+  --dns-namecheap-credentials=/dir/to/namecheap.ini \
+  --agree-tos \
+  --email email@any.com \
+  -d '*.domain.com'
+```
+
