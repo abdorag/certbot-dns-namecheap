@@ -122,7 +122,8 @@ deactivate
 chmod +x /usr/local/bin/certbot-namecheap
 ```
 
-#command for tested example 
+#command for tested example
+
 certbot-namecheap [certbot commands]
 ```sh
 certbot-namecheap certonly \
